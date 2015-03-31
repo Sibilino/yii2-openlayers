@@ -10,7 +10,7 @@ class OpenLayers extends Widget
 	
 	public $htmlOptions = [];
 	
-	public $scriptPosition = View::POS_READY;
+	public $scriptPosition = View::POS_END;
 	
 	public function init()
 	{
