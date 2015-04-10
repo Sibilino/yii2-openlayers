@@ -19,7 +19,7 @@ class OpenLayersTest extends TestCase
 				],
 			],
 			'aliases' => [
-				'@sibilino/yii2/openlayers' => '@vendor/sibilino/yii2/openlayers/widget', 
+				'@sibilino/yii2/openlayers' => __DIR__.'/../widget', 
 			],
 		]);
 	}
@@ -59,6 +59,12 @@ class OpenLayersTest extends TestCase
 	public function optionProvider()
 	{
 		return [
+			[ // modified jsVarName
+				[
+					'jsVarName' => 'testmap',
+				],
+				'^var testmap = new ol.Map\('
+			],
 			[ // Simplified View
 				[
 					'mapOptions' => [
@@ -73,7 +79,7 @@ class OpenLayersTest extends TestCase
 			[ // Custom View
 				[
 					'mapOptions' => [
-						'view' => new JsExpression('new ol.View({center: [0, 0], zoom: 2})'),
+						'view' => new OL('View', ['center'=>[0, 0], 'zoom'=>2]),
 					],
 				],
 				'view"?: ?new ol.View\({[^\w]*center"?: ?\[0, ?0\][^\w]*zoom"?: ?2[^\w]*}\)'
@@ -88,15 +94,27 @@ class OpenLayersTest extends TestCase
 				],
 				'layers"?: ?\[[^\w]*new ol.layer.Tile\({[^\w]*source"?: ?new ol.source.OSM\(\)[^\w]*\]'
 			],
+			[
+				[
+					'mapOptions' => [
+						'layers' => [
+							'Tile' => new OL('source.MapQuest', [
+								'layer' => 'sat',
+							]),
+						],
+					],
+				],
+				'layers"?: ?\[[^\w]*new ol.layer.Tile\({[^\w]*source"?: ?new ol.source.MapQuest\([^\w]*layer"?: ?"sat"[^\w]\)[^\w]*\]'
+			],
 			[ // Custom Layers
 				[
 					'mapOptions' => [
 						'layers' => [
-							new JsExpression('new ol.layer.Tile({source: osmsource})'),
+							new OL('layer.Tile', ['source'=>'osmsource']),
 						],
 					],
 				],
-				'layers"?: ?\[[^\w]*new ol.layer.Tile\({[^\w]*source"?: ?osmsource[^\w]*\]'
+				'layers"?: ?\[[^\w]*new ol.layer.Tile\({[^\w]*source"?: ?"osmsource"[^\w]*\]'
 			],
 		];
 	}

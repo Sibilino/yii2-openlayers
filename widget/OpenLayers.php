@@ -41,6 +41,7 @@ class OpenLayers extends Widget
 	 * @var array
 	 */
 	public $mapOptions = [];
+	public $jsVarName = 'map';
 	/**
 	 * @var int the position where the Map creation script must be inserted. Default is \yii\web\View::POS_END.
 	 * @see \yii\web\View::registerJs()
@@ -66,27 +67,34 @@ class OpenLayers extends Widget
 	 * Generates the creation script for the OpenLayers map with the current configuration.
 	 * @return string
 	 */
-	protected function getInitScript() {
-		$id = $this->options['id'];
-		
+	protected function getInitScript() {		
+		$this->processSimplifiedOptions();
+		return "var $this->jsVarName = ".Json::encode(new OL('Map', $this->mapOptions));
+	}
+	
+	protected function processSimplifiedOptions()
+	{
 		if (isset($this->mapOptions['view']) && is_array($this->mapOptions['view']))
-			$this->mapOptions['view'] = new JsExpression('new ol.View('.Json::encode($this->mapOptions['view']).')');
+			$this->mapOptions['view'] = new OL('View', $this->mapOptions['view']);
 		
 		if (isset($this->mapOptions['layers']))
 		{
+			$processedLayers = [];
 			foreach ($this->mapOptions['layers'] as $type => $source)
 			{
-				if (is_string($type) && is_string($source)) // Simplified layer syntax
-				{
-					unset($this->mapOptions['layers'][$type]);
-					$encodedLayers []= new JsExpression("new ol.layer.$type({source: new ol.source.$source()})");
-				}
+				if (!is_string($type))
+					$processedLayers [$type]= $source; // Unmodified
 				else
-					$encodedLayers [$type]= $source; // Unmodified
+				{
+					if (is_string($source))
+					{
+						$source = new OL("source.$source");
+					}
+					unset($this->mapOptions['layers'][$type]);
+					$processedLayers []= new OL("layer.$type", ['source' => $source]);
+				}					
 			}
-			$this->mapOptions['layers'] = $encodedLayers;
+			$this->mapOptions['layers'] = $processedLayers;
 		}
-				
-		return "var map = new ol.Map(".Json::encode($this->mapOptions).");";
 	}
 }
