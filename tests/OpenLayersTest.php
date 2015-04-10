@@ -59,7 +59,7 @@ class OpenLayersTest extends TestCase
 	public function optionProvider()
 	{
 		return [
-			[ // View
+			[ // Simplified View
 				[
 					'mapOptions' => [
 						'view' => [
@@ -69,6 +69,14 @@ class OpenLayersTest extends TestCase
 					],
 				],
 				'view"?: ?new ol.View\({[^\w]*center"?: ?ol.proj.transform\(\[37.41, 8.82\], "EPSG:4326", "EPSG:3857"[^\w]*zoom"?: ?4[^\w]*}\)'
+			],
+			[ // Custom View
+				[
+					'mapOptions' => [
+						'view' => new JsExpression('new ol.View({center: [0, 0], zoom: 2})'),
+					],
+				],
+				'view"?: ?new ol.View\({[^\w]*center"?: ?\[0, ?0\][^\w]*zoom"?: ?2[^\w]*}\)'
 			],
 			[ // Simplified Layers
 				[
