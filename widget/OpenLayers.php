@@ -87,6 +87,6 @@ class OpenLayers extends Widget
 			$this->mapOptions['layers'] = $encodedLayers;
 		}
 				
-		return "var map = new ol.Map({".Json::encode($this->mapOptions)."});";
+		return "var map = new ol.Map(".Json::encode($this->mapOptions).");";
 	}
 }
