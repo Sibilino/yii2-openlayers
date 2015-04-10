@@ -3,6 +3,7 @@ namespace sibilino\yii2\openlayers;
 
 use yiiunit\TestCase;
 use yii\web\View;
+use yii\web\JsExpression;
 
 class OpenLayersTest extends TestCase
 {
@@ -43,5 +44,43 @@ class OpenLayersTest extends TestCase
 		]);
 		OpenLayers::end();
 		$this->assertArrayHasKey(View::POS_LOAD, $widget->view->js);
+	}
+	
+	public function testView()
+	{
+		$widget = OpenLayers::begin([
+			'mapOptions' => [
+				'view' => [
+					'center' => new JsExpression('ol.proj.transform([37.41, 8.82], "EPSG:4326", "EPSG:3857")'),
+					'zoom' => 4,
+				],
+			],
+		]);
+		OpenLayers::end();
+		$script = $this->getLastScript($widget);
+		$this->assertRegExp('/view"?: ?new ol.View\({[^\w]*center"?: ?ol.proj.transform\(\[37.41, 8.82\], "EPSG:4326", "EPSG:3857"[^\w]*zoom"?: ?4[^\w]*}\)/', $script);
+	}
+	
+	public function testLayers()
+	{
+		$widget = OpenLayers::begin([
+			'mapOptions' => [
+				'layers' => [
+					'Tile' => 'OSM',
+				],
+			],
+		]);
+		OpenLayers::end();
+		$script = $this->getLastScript($widget);
+		$this->assertRegExp('/layers"?: ?\[[^\w]*new ol.layer.Tile\({[^\w]*source"?: ?new ol.source.OSM\(\)[^\w]*\]/', $script);
+	}
+	
+	/**
+	 * @param DygraphsWidget $widget
+	 * @return string
+	 */
+	private function getLastScript($widget) {
+		$scripts = $widget->view->js[$widget->scriptPosition];
+		return end($scripts);
 	}
 }

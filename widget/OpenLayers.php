@@ -4,6 +4,8 @@ namespace sibilino\yii2\openlayers;
 use yii\base\Widget;
 use yii\helpers\Html;
 use yii\web\View;
+use yii\helpers\Json;
+use yii\web\JsExpression;
 
 /**
  * Yii 2 widget encapsulating OpenLayers 3
@@ -18,6 +20,8 @@ class OpenLayers extends Widget
      * @see \yii\helpers\Html::renderTagAttributes() for details on how attributes are being rendered.
      */
 	public $options = [];
+	
+	public $mapOptions = [];
 	/**
 	 * @var int the position where the Map creation script must be inserted. Default is \yii\web\View::POS_END.
 	 * @see \yii\web\View::registerJs()
@@ -26,9 +30,10 @@ class OpenLayers extends Widget
 	
 	public function init()
 	{
-		OpenLayersBundle::register($this->view);
 		if (!isset($this->options['id']))
 			$this->options['id'] = $this->getId();
+		$this->mapOptions['target'] = $this->options['id'];
+		OpenLayersBundle::register($this->view);
 	}
 	
 	public function run()
@@ -44,18 +49,24 @@ class OpenLayers extends Widget
 	 */
 	protected function getInitScript() {
 		$id = $this->options['id'];
+		
+		if (isset($this->mapOptions['view']))
+			$this->mapOptions['view'] = new JsExpression('new ol.View('.Json::encode($this->mapOptions['view']).')');
+		if (isset($this->mapOptions['layers']))
+		{
+			$encodedLayers = [];
+			foreach ($this->mapOptions['layers'] as $type => $source)
+			{
+				if (is_string($type))
+				{
+					$encodedLayers []= new JsExpression("new ol.layer.$type({source: new ol.source.$source()})");
+				}
+			}
+			$this->mapOptions['layers'] = $encodedLayers;
+		}		
 		return "
 			var map = new ol.Map({
-				target: '$id',
-				layers: [
-					new ol.layer.Tile({
-						source: new ol.source.MapQuest({layer: 'sat'})
-					})
-				],
-				view: new ol.View({
-					center: ol.proj.transform([37.41, 8.82], 'EPSG:4326', 'EPSG:3857'),
-					zoom: 4
-				})
+				".Json::encode($this->mapOptions)."
 			});
 		";
 	}
