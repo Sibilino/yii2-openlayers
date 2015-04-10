@@ -98,6 +98,18 @@ class OpenLayersTest extends TestCase
 				[
 					'mapOptions' => [
 						'layers' => [
+							'Tile' => [
+								'visible' => false,
+							],
+						],
+					],
+				],
+				'layers"?: ?\[[^\w]*new ol.layer.Tile\({[^\w]*visible"?: ?false[^\w]*\]'
+			],
+			[
+				[
+					'mapOptions' => [
+						'layers' => [
 							'Tile' => new OL('source.MapQuest', [
 								'layer' => 'sat',
 							]),
