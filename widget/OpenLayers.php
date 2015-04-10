@@ -20,7 +20,26 @@ class OpenLayers extends Widget
      * @see \yii\helpers\Html::renderTagAttributes() for details on how attributes are being rendered.
      */
 	public $options = [];
-	
+	/**
+	 * The properties to be passed to the OpenLayers Map() constructor. The following special properties are supported:
+	 * <ul>
+	 * <li><b>view</b>: Array of properties to be passed to an OpenLayers View() constructor.
+	 * This means that a view can be specified without the need for a JsExpression object only to call the View constructor.
+	 * Example usage: <code>
+	 * 'view' => [
+	 *     'center' => new JsExpression('ol.proj.transform([37.41, 8.82], "EPSG:4326", "EPSG:3857")'),
+	 *     'zoom' => 4,
+	 * ],
+	 * </code></li>
+	 * <li><b>layers</b>: A simplified syntax is supported for this option, where layers can be specified as type => source string pairs.
+	 * For example: <code>
+	 * 'layers' => [
+	 *     'Tile' => 'OSM',
+	 *	],
+	 * </code></li>
+	 * </ul> 
+	 * @var array
+	 */
 	public $mapOptions = [];
 	/**
 	 * @var int the position where the Map creation script must be inserted. Default is \yii\web\View::POS_END.
@@ -50,24 +69,24 @@ class OpenLayers extends Widget
 	protected function getInitScript() {
 		$id = $this->options['id'];
 		
-		if (isset($this->mapOptions['view']))
+		if (isset($this->mapOptions['view']) && is_array($this->mapOptions['view']))
 			$this->mapOptions['view'] = new JsExpression('new ol.View('.Json::encode($this->mapOptions['view']).')');
+		
 		if (isset($this->mapOptions['layers']))
 		{
-			$encodedLayers = [];
 			foreach ($this->mapOptions['layers'] as $type => $source)
 			{
-				if (is_string($type))
+				if (is_string($type) && is_string($source)) // Simplified layer syntax
 				{
+					unset($this->mapOptions['layers'][$type]);
 					$encodedLayers []= new JsExpression("new ol.layer.$type({source: new ol.source.$source()})");
 				}
+				else
+					$encodedLayers [$type]= $source; // Unmodified
 			}
 			$this->mapOptions['layers'] = $encodedLayers;
-		}		
-		return "
-			var map = new ol.Map({
-				".Json::encode($this->mapOptions)."
-			});
-		";
+		}
+				
+		return "var map = new ol.Map({".Json::encode($this->mapOptions)."});";
 	}
 }
