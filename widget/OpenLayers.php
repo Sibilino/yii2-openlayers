@@ -8,7 +8,7 @@ use yii\helpers\Json;
 use yii\web\JsExpression;
 
 /**
- * Yii 2 widget encapsulating OpenLayers 3
+ * Yii 2 widget encapsulating OpenLayers 3 and offering simplified option specification.
  * @link https://github.com/Sibilino/yii2-openlayers
  * @copyright Copyright (c) 2015 Luis Hernández Hernández
  * @license http://opensource.org/licenses/MIT MIT
@@ -21,26 +21,14 @@ class OpenLayers extends Widget
      */
 	public $options = [];
 	/**
-	 * The properties to be passed to the OpenLayers Map() constructor. The following special properties are supported:
-	 * <ul>
-	 * <li><b>view</b>: Array of properties to be passed to an OpenLayers View() constructor.
-	 * This means that a view can be specified without the need for a JsExpression object only to call the View constructor.
-	 * Example usage: <code>
-	 * 'view' => [
-	 *     'center' => new JsExpression('ol.proj.transform([37.41, 8.82], "EPSG:4326", "EPSG:3857")'),
-	 *     'zoom' => 4,
-	 * ],
-	 * </code></li>
-	 * <li><b>layers</b>: A simplified syntax is supported for this option, where layers can be specified as type => source string pairs.
-	 * For example: <code>
-	 * 'layers' => [
-	 *     'Tile' => 'OSM',
-	 *	],
-	 * </code></li>
-	 * </ul> 
+	 * The properties to be passed to the OpenLayers Map() constructor. In order to ease passing complex javascript structures, some simplifications are supported.
+	 * See {@link OpenLayers::processSimplifiedOptions} for details on simplified option specification.
 	 * @var array
 	 */
 	public $mapOptions = [];
+	/**
+	 * @var string the naem for the JavasCript variable that will receive the Map object upon execution of the widget.
+	 */
 	public $jsVarName = 'map';
 	/**
 	 * @var int the position where the Map creation script must be inserted. Default is \yii\web\View::POS_END.
@@ -72,6 +60,24 @@ class OpenLayers extends Widget
 		return "var $this->jsVarName = ".Json::encode(new OL('Map', $this->mapOptions));
 	}
 	
+	/**
+	 * Checks whether several "complex" options have been specified as a key => value pair where key is a string.
+	 * If found, those properies will be automatically turned into the JavaScript expression that instantiates the corresponding OpenLayers object, thus eliminating the need to manually create a JsExpression object.
+	 * The value for these processed keys will be passed as options to the constructor of the OpenLayers object.
+	 * Supported simplified properties are:
+	 * <ul>
+	 * <li><b>view</b>: Can be specified as 'view' => $optionArray.
+	 * For example, <code>['view' => ['center'=>[0,0],'zoom'=>2]]</code> will produce this JS: <code>new ol.View({"center":[0,0], "zoom":2})</code>
+	 * </li>
+	 * <li><b>layers</b>: Each layer in the array can be specified as $type => $options, where $type is a string.
+	 * For example, <code>['layers' => ['Tile' => ['visible' => false]</code> will produce this JS: <code>new ol.layer.Tile({"visible": false})</code>
+	 * <li><b>layer sources</b>: In addition, when a layer's $type => $option pair are both strings, the $option is considered the layer's "source", and will also be converted to the corresponding object.
+	 * For example, <code>['layers' => ['Tile' => 'OSM']</code> will produce this JS: <code>new ol.layer.Tile({"source": new ol.source.OSM()})</code>
+	 * </li>
+	 * </ul>
+	 * If these simplifications are not enough to avoid using complex JsExpression structures, make sure to see the {@link OL} class for an abbreviated way of specifying OpenLayers object instances.
+	 * @see OL
+	 */
 	protected function processSimplifiedOptions()
 	{
 		if (isset($this->mapOptions['view']) && is_array($this->mapOptions['view']))
@@ -86,12 +92,16 @@ class OpenLayers extends Widget
 					$processedLayers [$type]= $source; // Unmodified
 				else
 				{
-					if (is_string($source))
-					{
-						$source = new OL("source.$source");
-					}
+					$layerOptions = [];
+					if (is_array($source))
+						$layerOptions = $source; // Not necessarily a source, use as normal option array
+					elseif (is_string($source))
+						$layerOptions['source'] =  new OL("source.$source");
+					elseif ($source instanceof JsExpression)
+						$layerOptions['source'] = $source;
+					
 					unset($this->mapOptions['layers'][$type]);
-					$processedLayers []= new OL("layer.$type", ['source' => $source]);
+					$processedLayers []= new OL("layer.$type", $layerOptions);
 				}					
 			}
 			$this->mapOptions['layers'] = $processedLayers;
