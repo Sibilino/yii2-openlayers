@@ -46,35 +46,53 @@ class OpenLayersTest extends TestCase
 		$this->assertArrayHasKey(View::POS_LOAD, $widget->view->js);
 	}
 	
-	public function testView()
+	/**
+	 * @dataProvider optionProvider
+	 */
+	public function testOptions($options, $outputRegExp)
 	{
-		$widget = OpenLayers::begin([
-			'mapOptions' => [
-				'view' => [
-					'center' => new JsExpression('ol.proj.transform([37.41, 8.82], "EPSG:4326", "EPSG:3857")'),
-					'zoom' => 4,
-				],
-			],
-		]);
+		$widget = OpenLayers::begin($options);
 		OpenLayers::end();
-		$script = $this->getLastScript($widget);
-		$this->assertRegExp('/view"?: ?new ol.View\({[^\w]*center"?: ?ol.proj.transform\(\[37.41, 8.82\], "EPSG:4326", "EPSG:3857"[^\w]*zoom"?: ?4[^\w]*}\)/', $script);
+		$this->assertRegExp("/$outputRegExp/", $this->getLastScript($widget));
 	}
 	
-	public function testLayers()
+	public function optionProvider()
 	{
-		$widget = OpenLayers::begin([
-			'mapOptions' => [
-				'layers' => [
-					'Tile' => 'OSM',
+		return [
+			[ // View
+				[
+					'mapOptions' => [
+						'view' => [
+							'center' => new JsExpression('ol.proj.transform([37.41, 8.82], "EPSG:4326", "EPSG:3857")'),
+							'zoom' => 4,
+						],
+					],
 				],
+				'view"?: ?new ol.View\({[^\w]*center"?: ?ol.proj.transform\(\[37.41, 8.82\], "EPSG:4326", "EPSG:3857"[^\w]*zoom"?: ?4[^\w]*}\)'
 			],
-		]);
-		OpenLayers::end();
-		$script = $this->getLastScript($widget);
-		$this->assertRegExp('/layers"?: ?\[[^\w]*new ol.layer.Tile\({[^\w]*source"?: ?new ol.source.OSM\(\)[^\w]*\]/', $script);
+			[ // Simplified Layers
+				[
+					'mapOptions' => [
+						'layers' => [
+							'Tile' => 'OSM',
+						],
+					],
+				],
+				'layers"?: ?\[[^\w]*new ol.layer.Tile\({[^\w]*source"?: ?new ol.source.OSM\(\)[^\w]*\]'
+			],
+			[ // Custom Layers
+				[
+					'mapOptions' => [
+						'layers' => [
+							new JsExpression('new ol.layer.Tile({source: osmsource})'),
+						],
+					],
+				],
+				'layers"?: ?\[[^\w]*new ol.layer.Tile\({[^\w]*source"?: ?osmsource[^\w]*\]'
+			],
+		];
 	}
-	
+		
 	/**
 	 * @param DygraphsWidget $widget
 	 * @return string
