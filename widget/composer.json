@@ -1,0 +1,21 @@
+{
+    "name": "sibilino/yii2-openlayers",
+    "description": "Map widget encapsulating the OpenLayers 3 library for easy use in Yii 2.",
+    "keywords": ["map","yii","yii2","widget","openlayers","openlayers3"],
+    "homepage": "https://github.com/Sibilino/yii2-openlayers",
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "Luis Hernández Hernández",
+            "role": "Developer"
+        }
+    ],
+    "require": {
+        "yiisoft/yii2": "*"
+    },
+    "autoload": {
+        "psr-4": {
+            "sibilino\\yii2\\openlayers\\": "widget/"
+        }
+    }
+}
