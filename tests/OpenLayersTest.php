@@ -1,5 +1,5 @@
 <?php
-namespace sibilino\y2openlayers;
+namespace sibilino\yii2\openlayers;
 
 use yiiunit\TestCase;
 use yii\web\View;
@@ -30,7 +30,7 @@ class OpenLayersTest extends TestCase
 		$widget = OpenLayers::begin();
 		$this->assertTrue(isset($widget->options['id']));
 		$this->assertTrue(isset($widget->jsVarName));
-		$this->assertArrayHasKey('sibilino\y2openlayers\OpenLayersBundle', $widget->view->assetBundles);
+		$this->assertArrayHasKey('sibilino\yii2\openlayers\OpenLayersBundle', $widget->view->assetBundles);
 	}
 	
 	public function testRun()

@@ -1,5 +1,5 @@
 <?php
-namespace sibilino\y2openlayers;
+namespace sibilino\yii2\openlayers;
 
 use yiiunit\TestCase;
 use yii\helpers\Json;

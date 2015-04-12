@@ -1,5 +1,5 @@
 <?php
-namespace sibilino\y2openlayers;
+namespace sibilino\yii2\openlayers;
 
 use yii\base\Widget;
 use yii\helpers\Html;
