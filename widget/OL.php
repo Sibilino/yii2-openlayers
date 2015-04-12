@@ -1,5 +1,5 @@
 <?php
-namespace sibilino\yii2\openlayers;
+namespace sibilino\y2openlayers;
 
 use yii\web\JsExpression;
 use yii\helpers\Json;
