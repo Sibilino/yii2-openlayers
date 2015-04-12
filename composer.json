@@ -15,7 +15,7 @@
     },
     "autoload": {
         "psr-4": {
-            "sibilino\\yii2\\openlayers\\": "widget/"
+            "sibilino\\y2openlayers\\": "widget/"
         }
     }
 }
