@@ -6,7 +6,7 @@ use yii\web\View;
 
 class OpenLayersBundle extends AssetBundle 
 {
-	public $sourcePath = '@vendor/sibilino/yii2/openlayers/widget';
+	public $sourcePath = __DIR__;
 	
 	public $js = [
 		'js/ol.js',
