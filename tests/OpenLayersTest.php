@@ -29,6 +29,7 @@ class OpenLayersTest extends TestCase
 	{
 		$widget = OpenLayers::begin();
 		$this->assertTrue(isset($widget->options['id']));
+		$this->assertTrue(isset($widget->jsVarName));
 		$this->assertArrayHasKey('sibilino\yii2\openlayers\OpenLayersBundle', $widget->view->assetBundles);
 	}
 	

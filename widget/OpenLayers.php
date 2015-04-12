@@ -29,7 +29,7 @@ class OpenLayers extends Widget
 	/**
 	 * @var string the naem for the JavasCript variable that will receive the Map object upon execution of the widget.
 	 */
-	public $jsVarName = 'map';
+	public $jsVarName;
 	/**
 	 * @var int the position where the Map creation script must be inserted. Default is \yii\web\View::POS_END.
 	 * @see \yii\web\View::registerJs()
@@ -40,26 +40,21 @@ class OpenLayers extends Widget
 	{
 		if (!isset($this->options['id']))
 			$this->options['id'] = $this->getId();
+		if (!isset($this->jsVarName))
+			$this->jsVarName = $this->options['id'];
 		$this->mapOptions['target'] = $this->options['id'];
 		OpenLayersBundle::register($this->view);
 	}
 	
 	public function run()
 	{
-		$this->view->registerJs($this->getInitScript(), $this->scriptPosition);
+		$this->processSimplifiedOptions();
+		$script = "var $this->jsVarName = ".Json::encode(new OL('Map', $this->mapOptions));
+		$this->view->registerJs($script, $this->scriptPosition);
 		
 		return Html::tag('div', '', $this->options);
 	}
-	
-	/**
-	 * Generates the creation script for the OpenLayers map with the current configuration.
-	 * @return string
-	 */
-	protected function getInitScript() {		
-		$this->processSimplifiedOptions();
-		return "var $this->jsVarName = ".Json::encode(new OL('Map', $this->mapOptions));
-	}
-	
+		
 	/**
 	 * Checks whether several "complex" options have been specified as a key => value pair where key is a string.
 	 * If found, those properies will be automatically turned into the JavaScript expression that instantiates the corresponding OpenLayers object, thus eliminating the need to manually create a JsExpression object.
