@@ -111,9 +111,11 @@ class OpenLayersTest extends TestCase
 				[
 					'mapOptions' => [
 						'layers' => [
-							'Tile' => new OL('source.MapQuest', [
-								'layer' => 'sat',
-							]),
+							'Tile' => [
+								'source' => new OL('source.MapQuest', [
+									'layer' => 'sat',
+								])
+							],
 						],
 					],
 				],

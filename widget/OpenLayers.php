@@ -81,23 +81,18 @@ class OpenLayers extends Widget
 		if (isset($this->mapOptions['layers']))
 		{
 			$processedLayers = [];
-			foreach ($this->mapOptions['layers'] as $type => $source)
+			foreach ($this->mapOptions['layers'] as $type => $options)
 			{
-				if (!is_string($type))
-					$processedLayers [$type]= $source; // Unmodified
-				else
+				
+				if (is_string($type))
 				{
-					$layerOptions = [];
-					if (is_array($source))
-						$layerOptions = $source; // Not necessarily a source, use as normal option array
-					elseif (is_string($source))
-						$layerOptions['source'] =  new OL("source.$source");
-					elseif ($source instanceof JsExpression)
-						$layerOptions['source'] = $source;
+					if (is_string($options))
+						$options = ['source' => new OL("source.$options")];
+					$processedLayers []= new OL("layer.$type", $options);
+				}
+				else
+					$processedLayers [$type]= $options; // Unmodified
 					
-					unset($this->mapOptions['layers'][$type]);
-					$processedLayers []= new OL("layer.$type", $layerOptions);
-				}					
 			}
 			$this->mapOptions['layers'] = $processedLayers;
 		}

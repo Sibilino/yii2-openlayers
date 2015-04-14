@@ -19,7 +19,7 @@ class OL extends JsExpression
 	 */
 	protected $class;
 	/**
-	 * @var array the properties to be passed to the constructor of $class.
+	 * @var array|null the properties to be passed to the constructor of $class.
 	 */
 	protected $properties;
 	
