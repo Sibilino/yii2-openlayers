@@ -22,7 +22,7 @@ class OpenLayers extends Widget
 	public $options = [];
 	/**
 	 * The properties to be passed to the OpenLayers Map() constructor. In order to ease passing complex javascript structures, some simplifications are supported.
-	 * See {@link OpenLayers::processSimplifiedOptions} for details on simplified option specification.
+	 * See {@link OpenLayers::processOptions} for details on simplified option specification.
 	 * @var array
 	 */
 	public $mapOptions = [];
@@ -48,13 +48,14 @@ class OpenLayers extends Widget
 	
 	public function run()
 	{
-		$this->processSimplifiedOptions();
+		$this->processOptions();
+		
 		$script = "var $this->jsVarName = ".Json::encode(new OL('Map', $this->mapOptions));
 		$this->view->registerJs($script, $this->scriptPosition);
 		
 		return Html::tag('div', '', $this->options);
 	}
-		
+	
 	/**
 	 * Checks whether several "complex" options have been specified as a key => value pair where key is a string.
 	 * If found, those properies will be automatically turned into the JavaScript expression that instantiates the corresponding OpenLayers object, thus eliminating the need to manually create a JsExpression object.
@@ -63,7 +64,6 @@ class OpenLayers extends Widget
 	 * <ul>
 	 * <li><b>view</b>: Can be specified as 'view' => $optionArray.
 	 * For example, <code>['view' => ['center'=>[0,0],'zoom'=>2]]</code> will produce this JS: <code>new ol.View({"center":[0,0], "zoom":2})</code>
-	 * </li>
 	 * <li><b>layers</b>: Each layer in the array can be specified as $type => $options, where $type is a string.
 	 * For example, <code>['layers' => ['Tile' => ['visible' => false]</code> will produce this JS: <code>new ol.layer.Tile({"visible": false})</code>
 	 * <li><b>layer sources</b>: In addition, when a layer's $type => $option pair are both strings, the $option is considered the layer's "source", and will also be converted to the corresponding object.
@@ -73,28 +73,33 @@ class OpenLayers extends Widget
 	 * If these simplifications are not enough to avoid using complex JsExpression structures, make sure to see the {@link OL} class for an abbreviated way of specifying OpenLayers object instances.
 	 * @see OL
 	 */
-	protected function processSimplifiedOptions()
+	protected function processOptions()
 	{
 		if (isset($this->mapOptions['view']) && is_array($this->mapOptions['view']))
 			$this->mapOptions['view'] = new OL('View', $this->mapOptions['view']);
 		
 		if (isset($this->mapOptions['layers']))
+			$this->processSimplifiedLayers();
+	}
+	
+	/**
+	 * Takes each key => value pair in $this->mapOptions['layers'] and checks if key is a string. In that case, a new Layer OL object will created for this layer.
+	 * Then, if the value is also a string, the corresponding Source OL object is created as well. 
+	 */
+	protected function processSimplifiedLayers()
+	{
+		$processedLayers = [];
+		foreach ($this->mapOptions['layers'] as $type => $options)
 		{
-			$processedLayers = [];
-			foreach ($this->mapOptions['layers'] as $type => $options)
+			if (is_string($type))
 			{
-				
-				if (is_string($type))
-				{
-					if (is_string($options))
-						$options = ['source' => new OL("source.$options")];
-					$processedLayers []= new OL("layer.$type", $options);
-				}
-				else
-					$processedLayers [$type]= $options; // Unmodified
-					
+				if (is_string($options))
+					$options = ['source' => new OL("source.$options")];
+				$processedLayers []= new OL("layer.$type", $options);
 			}
-			$this->mapOptions['layers'] = $processedLayers;
+			else
+				$processedLayers [$type]= $options; // Unmodified
 		}
+		$this->mapOptions['layers'] = $processedLayers;
 	}
 }
