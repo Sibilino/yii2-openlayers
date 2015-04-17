@@ -50,7 +50,7 @@ class OpenLayers extends Widget
 	{
 		$this->processOptions();
 		
-		$script = "var $this->jsVarName = ".Json::encode(new OL('Map', $this->mapOptions));
+		$script = "var $this->jsVarName = ".Json::encode(new OL('Map', $this->mapOptions)).";";
 		$this->view->registerJs($script, $this->scriptPosition);
 		
 		return Html::tag('div', '', $this->options);
