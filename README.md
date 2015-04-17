@@ -34,7 +34,7 @@ Next, edit your application's _config_ file (usually `config/main.php` or `confi
 ]
 ```
 
-Remember to use the namespace `sibilino\yii2\openlayers` when you calling any of the widget's classes:
+Remember to use the namespace `sibilino\yii2\openlayers` when calling any of the widget's classes:
 ```php
 use sibilino\yii2\openlayers\OpenLayers;
 use sibilino\yii2\openlayers\OL;
@@ -42,7 +42,7 @@ use sibilino\yii2\openlayers\OL;
 
 # Usage
 --------
-In your view, echo the result of passing your configuration array to the widget method, as usual. This configuration array will then be encoded in JSON in order to be passed as options to the OpenLayers Map(). For example:
+In your view, echo the widget method as usual. The options for the OpenLayers Map() can be specified in `mapOptions`. For example:
 ```php
 use sibilino\yii2\openlayers\OpenLayers;
 use sibilino\yii2\openlayers\OL;
@@ -52,7 +52,7 @@ echo OpenLayers::widget([
 	'id' => 'test',
 	'mapOptions' => [
 		'layers' => [
-			new OL('layer.Tile', [
+			new OL('layer.Tile', [ // Generates "new ol.layer.Tile()" JS. See below for an explanation of the OL class.
 				'source' => new OL('source.MapQuest', [
 					'layer' => 'sat',
 				]),
@@ -65,21 +65,53 @@ echo OpenLayers::widget([
 	],
 ]);?>
 ```
-As usual, whenever a JavaScript expression must be passed as a configuration option, a JsExpression object is needed. However, this widget offers the OL class to easily specify OpenLayers objects in the configuration.
-
-For details on the OL class, read the next section.
+For configuration details, read the next section.
  
 For details and examples on OpenLayers configuration, see [the official OpenLayers 3 documentation] (http://openlayers.org/).
 
-## Specifying OpenLayers "ol." objects using the OL class
----------------------------------------------------------
+## Configuration
+----------------
+The widget supports the following configuration options:
+* `id`: The id for the widget and the generated container div.
+* `options`: Array of HTML options for the container div.
+* `jsVarName`: The name of the JavaScript variable that will receive the Map object upon construction.
+* `scriptPosition`: The position where the widget will register the map generation code (`View::POS_END` by default). Note that the OpenLayers _library_ will always be registered in `View::POS_HEAD`.
+* `mapOptions`: The configuration array to be passed to the JavaScript OpenLayers Map() constructor. Its structure and available options are the same that are supported by the [OpenLayers 3 library] (http://openlayers.org/). Some simplifications are supported by the widget, as described in the next section.
+
+### Simplified mapOptions
+-------------------------
+#### Passing JavaScript and the OL class
+----------------------------------------
 Many of the OpenLayers options must be specified by an instance of a JavaScript object under the "ol" namespace. This would traditionally require a JsExpression with a string such as `new ol.layer.Tile()` (for a Tile object), with further complications to pass configuration to the constructed object.
 To avoid this cumbersome notation, the OL class can be used. Its constructor accepts a classname, which can include namespace information, and an array of options for the classname's constructor. For example:
 ```php
 $olObject = new OL('source.MapQuest', ['layer' => 'sat']);
 ``` 
 Each OL object behaves as a JsExpression that will generate the JavasCript code to instantiate the specified classname with the options. In the case of the example, the resulting code would be:
-```php
+```javascript
 new ol.source.MapQuest({layer:"sat"})
 ```
- 
+In the end, this allows the PHP configuration array to be created just like the desired JavaScript configuration object, but using `new OL('Something')` whenever `new ol.Something()` is required.
+#### Specifying Layers with strings
+-----------------------------------
+When specifying the `mapOptions['layers']` array, you can identify a layer by passing a layer type as a string, instead of creating an OL object. In the first example case, the result would be:
+```php
+'mapOptions' => [
+	'layers' => [
+		'Tile' => [ // The layer type as a string, no need for new OL('layer.Tile' ...)
+			'source' => new OL('source.MapQuest', [
+				'layer' => 'sat',
+			])
+		],
+	],
+],
+```
+In addition, whenever a layer has been defined using a type string, the source can _also_ be specified using a type string. For example:
+```php
+'mapOptions' => [
+	'layers' => [
+		// Again no need for OL('ol.source.OSM'), but no configuration can be passed to the OSM object in this case.
+		'Tile' => 'OSM',
+	],
+],
+```
