@@ -61,7 +61,7 @@ echo OpenLayers::widget([
 				]),
 			]),
 		],
-		'view' => [
+		'view' => [ // No OL() is required here because of simplified option support (see below)
 			'center' => new JsExpression('ol.proj.transform([37.41, 8.82], "EPSG:4326", "EPSG:3857")'),
 			'zoom' => 4,
 		],
@@ -95,9 +95,9 @@ Each OL object behaves as a JsExpression that will generate the JavasCript code 
 new ol.source.MapQuest({layer:"sat"})
 ```
 In the end, this allows the PHP configuration array to be created just like the desired JavaScript configuration object, but using `new OL('Something')` whenever `new ol.Something()` is required.
-#### Specifying Layers with strings
------------------------------------
-When specifying the `mapOptions['layers']` array, you can identify a layer by passing a layer type as a string, instead of creating an OL object. In the first example case, the result would be:
+#### Specifying options using strings
+-------------------------------------
+When specifying the `mapOptions['view']` or `mapOptions['layers']` arrays, you can identify the object by specifying the type as a string, instead of creating the corresponding OL instance. In the first example case, the result would be:
 ```php
 'mapOptions' => [
 	'layers' => [
@@ -105,6 +105,10 @@ When specifying the `mapOptions['layers']` array, you can identify a layer by pa
 			'source' => new OL('source.MapQuest', [
 				'layer' => 'sat',
 			])
+		],
+		'view' => [ // The 'view' option does not require new OL('View' ...) either
+			'center' => new JsExpression('ol.proj.transform([37.41, 8.82], "EPSG:4326", "EPSG:3857")'),
+			'zoom' => 4,
 		],
 	],
 ],
