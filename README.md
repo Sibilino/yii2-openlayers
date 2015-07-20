@@ -45,10 +45,14 @@ use sibilino\yii2\openlayers\OL;
 
 # Usage
 --------
-In your view, echo the widget method as usual. The options for the OpenLayers Map() can be specified in `mapOptions`. For example:
+In your view, echo the widget method as usual. The options for the OpenLayers Map() can be specified in `mapOptions`.
+The idea is that the javascript options for OpenLayers will be directly translated to a PHP array, using `new OL('something')` when the javascript requires `new ol.something()`.
+
+For example:
 ```php
 use sibilino\yii2\openlayers\OpenLayers;
 use sibilino\yii2\openlayers\OL;
+use yii\web\JsExpression;
 //...
 
 echo OpenLayers::widget([
@@ -95,8 +99,8 @@ Each OL object behaves as a JsExpression that will generate the JavasCript code 
 new ol.source.MapQuest({layer:"sat"})
 ```
 In the end, this allows the PHP configuration array to be created just like the desired JavaScript configuration object, but using `new OL('Something')` whenever `new ol.Something()` is required.
-#### Specifying options using strings
--------------------------------------
+#### Specifying options using shortcut strings
+----------------------------------------------
 When specifying the `mapOptions['view']` or `mapOptions['layers']` arrays, you can identify the object by specifying the type as a string, instead of creating the corresponding OL instance. In the first example case, the result would be:
 ```php
 'mapOptions' => [
