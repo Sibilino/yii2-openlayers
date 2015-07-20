@@ -59,13 +59,16 @@ echo OpenLayers::widget([
 	'id' => 'test',
 	'mapOptions' => [
 		'layers' => [
-			new OL('layer.Tile', [ // Generates "new ol.layer.Tile()" JS. See below for an explanation of the OL class.
+			// Easily generate JavaScript "new ol.layer.Tile()" using the OL class
+			new OL('layer.Tile', [
 				'source' => new OL('source.MapQuest', [
 					'layer' => 'sat',
 				]),
 			]),
 		],
-		'view' => [ // No OL() is required here because of simplified option support (see below)
+		// Using a shortcut, we can skip the OL('View' ...)
+		'view' => [
+			// Of course, the generated JS can be customized with JsExpression, as usual
 			'center' => new JsExpression('ol.proj.transform([37.41, 8.82], "EPSG:4326", "EPSG:3857")'),
 			'zoom' => 4,
 		],
@@ -78,7 +81,7 @@ For details and examples on OpenLayers configuration, see [the official OpenLaye
 
 ## Configuration
 ----------------
-The widget supports the following configuration options:
+The widget supports the following configuration options (to be used outside of the mapOptions array):
 * `id`: The id for the widget and the generated container div.
 * `options`: Array of HTML options for the container div.
 * `jsVarName`: The name of the JavaScript variable that will receive the Map object upon construction.
@@ -101,7 +104,8 @@ new ol.source.MapQuest({layer:"sat"})
 In the end, this allows the PHP configuration array to be created just like the desired JavaScript configuration object, but using `new OL('Something')` whenever `new ol.Something()` is required.
 #### Specifying options using shortcut strings
 ----------------------------------------------
-When specifying the `mapOptions['view']` or `mapOptions['layers']` arrays, you can identify the object by specifying the type as a string, instead of creating the corresponding OL instance. In the first example case, the result would be:
+When specifying the `mapOptions['view']` or `mapOptions['layers']` arrays, you can identify the some objects by specifying them with a string, instead of creating the corresponding OL instance.
+The options that support such a string shortcut are `mapOptions['view']` and any layer in `mapOptions['layers']`. For example:
 ```php
 'mapOptions' => [
 	'layers' => [
@@ -110,10 +114,10 @@ When specifying the `mapOptions['view']` or `mapOptions['layers']` arrays, you c
 				'layer' => 'sat',
 			])
 		],
-		'view' => [ // The 'view' option does not require new OL('View' ...) either
-			'center' => new JsExpression('ol.proj.transform([37.41, 8.82], "EPSG:4326", "EPSG:3857")'),
-			'zoom' => 4,
-		],
+	],
+	'view' => [ // The 'view' option does not require new OL('View' ...) either
+		'center' => new JsExpression('ol.proj.transform([37.41, 8.82], "EPSG:4326", "EPSG:3857")'),
+		'zoom' => 4,
 	],
 ],
 ```
