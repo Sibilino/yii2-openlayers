@@ -10,7 +10,7 @@ use yii\web\JsExpression;
 /**
  * Yii 2 widget encapsulating OpenLayers 3 and offering simplified option specification.
  * @link https://github.com/Sibilino/yii2-openlayers
- * @copyright Copyright (c) 2015 Luis Hernández Hernández
+ * @copyright Copyright (c) 2015 Luis HernÃ¡ndez HernÃ¡ndez
  * @license http://opensource.org/licenses/MIT MIT
  */
 class OpenLayers extends Widget
@@ -97,6 +97,8 @@ class OpenLayers extends Widget
 					$options = ['source' => new OL("source.$options")];
 				$processedLayers []= new OL("layer.$type", $options);
 			}
+			elseif (is_int($type)) // Therefore $type is simply the array index
+				$processedLayers []= $options;
 			else
 				$processedLayers [$type]= $options; // Unmodified
 		}
