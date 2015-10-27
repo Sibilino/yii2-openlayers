@@ -95,12 +95,11 @@ class OpenLayers extends Widget
 			{
 				if (is_string($options))
 					$options = ['source' => new OL("source.$options")];
+					
 				$processedLayers []= new OL("layer.$type", $options);
 			}
-			elseif (is_int($type)) // Therefore $type is simply the array index
+			else // Therefore $type is simply an integer array key
 				$processedLayers []= $options;
-			else
-				$processedLayers [$type]= $options; // Unmodified
 		}
 		$this->mapOptions['layers'] = $processedLayers;
 	}
