@@ -29,8 +29,11 @@ class OLTest extends TestCase
 			'view' => 'testview',
 			'source' => new OL('test.source.WTF', [
 				'foo' => 'bar',
+                'test' => new OL('test.Lol', new OL('test.nested', [
+                    'why' => 'weCan',
+                ]))
 			])
 		]);
-		$this->assertEquals('new ol.layer.Test({"view":"testview","source":new ol.test.source.WTF({"foo":"bar"})})', Json::encode($config));
+		$this->assertEquals('new ol.layer.Test({"view":"testview","source":new ol.test.source.WTF({"foo":"bar","test":new ol.test.Lol(new ol.test.nested({"why":"weCan"}))})})', Json::encode($config));
 	}
 }
