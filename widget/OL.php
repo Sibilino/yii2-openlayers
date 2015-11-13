@@ -60,9 +60,9 @@ class OL extends JsExpression
 	 * }
 	 * </pre>
 	 * @param string $class
-	 * @param array $properties
+	 * @param mixed $properties
 	 */
-	public function __construct($class, array $properties = null)
+	public function __construct($class, $properties = null)
 	{
 		$this->class = $class;
 		$this->properties = $properties;
