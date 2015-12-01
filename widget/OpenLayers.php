@@ -27,10 +27,6 @@ class OpenLayers extends Widget
 	 */
 	public $mapOptions = [];
 	/**
-	 * @var string the naem for the JavasCript variable that will receive the Map object upon execution of the widget.
-	 */
-	public $jsVarName;
-	/**
 	 * @var int the position where the Map creation script must be inserted. Default is \yii\web\View::POS_END.
 	 * @see \yii\web\View::registerJs()
 	 */
@@ -40,18 +36,17 @@ class OpenLayers extends Widget
 	{
 		if (!isset($this->options['id']))
 			$this->options['id'] = $this->getId();
-		if (!isset($this->jsVarName))
-			$this->jsVarName = $this->options['id'];
 		$this->mapOptions['target'] = $this->options['id'];
 		OpenLayersBundle::register($this->view);
+        ModuleBundle::register($this->view);
 	}
 	
 	public function run()
 	{
 		$this->processOptions();
-		
-		$script = "var $this->jsVarName = ".Json::encode(new OL('Map', $this->mapOptions)).";";
-		$this->view->registerJs($script, $this->scriptPosition);
+
+		$script = "sibilino.openlayers.createMap(".Json::encode($this->mapOptions).")";
+		$this->view->registerJs($script);
 		
 		return Html::tag('div', '', $this->options);
 	}
