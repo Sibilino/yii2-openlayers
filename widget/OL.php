@@ -8,7 +8,7 @@ use yii\helpers\Json;
  * This class makes it easier to specify OpenLayers objects as options for the OpenLayers widget, resulting in more concise PHP array structures than when using JsExpression.
  * See {@link OL::__construct} for usage examples.
  * @link https://github.com/Sibilino/yii2-openlayers
- * @copyright Copyright (c) 2015 Luis Hernández Hernández
+ * @copyright Copyright (c) 2015 Luis HernÃ¡ndez HernÃ¡ndez
  * @license http://opensource.org/licenses/MIT MIT
  */
 class OL extends JsExpression
@@ -81,5 +81,9 @@ class OL extends JsExpression
 			$properties = '';
 		return "new ol.$this->class($properties)";
 	}
+
+    public function __toString() {
+        return $this->expression;
+    }
 	
 }
