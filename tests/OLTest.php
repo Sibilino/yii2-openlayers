@@ -3,6 +3,7 @@ namespace sibilino\yii2\openlayers;
 
 use yiiunit\TestCase;
 use yii\helpers\Json;
+use yii\web\JsExpression;
 
 class OLTest extends TestCase
 {
@@ -31,9 +32,10 @@ class OLTest extends TestCase
 				'foo' => 'bar',
                 'test' => new OL('test.Lol', new OL('test.nested', [
                     'why' => 'weCan',
-                ]))
+                ])),
+                'string' => new JsExpression('{"data": transform(data, '.new OL('data.Object').')}'),
 			])
 		]);
-		$this->assertEquals('new ol.layer.Test({"view":"testview","source":new ol.test.source.WTF({"foo":"bar","test":new ol.test.Lol(new ol.test.nested({"why":"weCan"}))})})', Json::encode($config));
+		$this->assertEquals('new ol.layer.Test({"view":"testview","source":new ol.test.source.WTF({"foo":"bar","test":new ol.test.Lol(new ol.test.nested({"why":"weCan"})),"string":{"data": transform(data, new ol.data.Object())}})})', Json::encode($config));
 	}
 }
