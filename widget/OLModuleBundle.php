@@ -3,7 +3,7 @@ namespace sibilino\yii2\openlayers;
 
 use yii\web\AssetBundle;
 
-class ModuleBundle extends AssetBundle
+class OLModuleBundle extends AssetBundle
 {
     public $sourcePath = __DIR__;
 

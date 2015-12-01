@@ -22,30 +22,35 @@ class OpenLayers extends Widget
 	public $options = [];
 	/**
 	 * The properties to be passed to the OpenLayers Map() constructor. In order to ease passing complex javascript structures, some simplifications are supported.
-	 * See {@link OpenLayers::processOptions} for details on simplified option specification.
+	 * See {@link OpenLayers::processMapOptions} for details on simplified option specification.
 	 * @var array
 	 */
 	public $mapOptions = [];
-	/**
-	 * @var int the position where the Map creation script must be inserted. Default is \yii\web\View::POS_END.
-	 * @see \yii\web\View::registerJs()
-	 */
-	public $scriptPosition = View::POS_END;
-	
+
+    public $jsMapName;
+    public $jsOptionIdentifier;
+
 	public function init()
 	{
 		if (!isset($this->options['id']))
 			$this->options['id'] = $this->getId();
+		if (!isset($this->jsMapName))
+			$this->jsMapName = $this->options['id'];
 		$this->mapOptions['target'] = $this->options['id'];
 		OpenLayersBundle::register($this->view);
-        ModuleBundle::register($this->view);
+        OLModuleBundle::register($this->view);
 	}
 	
 	public function run()
 	{
-		$this->processOptions();
+		$this->processMapOptions();
+        
+        if ($this->jsOptionIdentifier) {
+            $script = "sibilino.openlayers.createMap(".Json::encode($this->mapOptions).", \"$this->jsMapName\", $this->jsOptionIdentifier)";
+        } else {
+            $script = "sibilino.openlayers.createMap(".Json::encode($this->mapOptions).", \"$this->jsMapName\")";
+        }
 
-		$script = "sibilino.openlayers.createMap(".Json::encode($this->mapOptions).")";
 		$this->view->registerJs($script);
 		
 		return Html::tag('div', '', $this->options);
@@ -68,7 +73,7 @@ class OpenLayers extends Widget
 	 * If these simplifications are not enough to avoid using complex JsExpression structures, make sure to see the {@link OL} class for an abbreviated way of specifying OpenLayers object instances.
 	 * @see OL
 	 */
-	protected function processOptions()
+	protected function processMapOptions()
 	{
 		if (isset($this->mapOptions['view']) && is_array($this->mapOptions['view']))
 			$this->mapOptions['view'] = new OL('View', $this->mapOptions['view']);
