@@ -60,6 +60,7 @@ The widget supports the following configuration options (to be used outside of t
 # Specifying map options
 ------------------------
 The problem with OpenLayers map options is that they require complex javascript structures. Two approches are available:
+
 1. Manage your configuration in PHP and translate it to javascript.
 2. Manage your configuration directly in javascript.
 
@@ -147,7 +148,7 @@ In addition, whenever a layer has been defined using a type string, the source c
 
 ## Map options as javascript
 ----------------------------
-The widget publishes a javascript module that is exposed in the global scope as `sibilino.openlayers`. Options for the creation of the map with id `mapId` can be specified as an object in the `sibilino.openlayers.mapOptions`array, associated with the `mapId` key. For example:
+The widget publishes a javascript module that is exposed in the global scope as `sibilino.openlayers`. Options for the creation of the map with id `mapId` can be specified as an object in the `sibilino.openlayers.mapOptions` array, associated with the `mapId` key. For example:
 ```js
 sibilino.openlayers.mapOptions[mapId] = {
     layers: [
