@@ -27,15 +27,10 @@ class OpenLayers extends Widget
 	 */
 	public $mapOptions = [];
 
-    public $jsMapName;
-    public $jsOptionIdentifier;
-
 	public function init()
 	{
 		if (!isset($this->options['id']))
 			$this->options['id'] = $this->getId();
-		if (!isset($this->jsMapName))
-			$this->jsMapName = $this->options['id'];
 		$this->mapOptions['target'] = $this->options['id'];
 		OpenLayersBundle::register($this->view);
         OLModuleBundle::register($this->view);
@@ -45,12 +40,7 @@ class OpenLayers extends Widget
 	{
 		$this->processMapOptions();
         
-        if ($this->jsOptionIdentifier) {
-            $script = "sibilino.openlayers.createMap(".Json::encode($this->mapOptions).", \"$this->jsMapName\", $this->jsOptionIdentifier)";
-        } else {
-            $script = "sibilino.openlayers.createMap(".Json::encode($this->mapOptions).", \"$this->jsMapName\")";
-        }
-
+        $script = 'sibilino.olwidget.createMap('.Json::encode($this->mapOptions).', "'.$this->options['id'].'")';
 		$this->view->registerJs($script);
 		
 		return Html::tag('div', '', $this->options);

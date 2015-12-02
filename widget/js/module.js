@@ -1,7 +1,7 @@
 if (typeof sibilino === "undefined") {
     sibilino = {}; // Initialize sibilino as empty object if not existing
 }
-sibilino.openlayers = (function ($) {
+sibilino.olwidget = (function ($) {
     var pub = {
         isActive: true,
         init: function () {
@@ -17,10 +17,10 @@ sibilino.openlayers = (function ($) {
             if (typeof id === "undefined") {
                 id = options['target'];
             }
-            if (mapOptions[id]) {
-                $.extend(true, options, mapOptions[id]); // Deep merge of mapOptions into options
+            if (pub.mapOptions[id]) {
+                $.extend(true, options, pub.mapOptions[id]); // Deep merge of mapOptions into options
             }
-            maps[id] = new ol.Map(options);
+            this.maps[id] = new ol.Map(options);
         },
         maps: {},
         getMapById: function (id) {
