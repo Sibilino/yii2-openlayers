@@ -8,15 +8,17 @@ sibilino.openlayers = (function ($) {
             // Nothing to init
         },
         // Storage for additional options that may be set by other javascript scripts
-        // Usage: sibilino.openlayers.mapOptions["identifier"] = { layers: [new ol.layer.Vector(...)] }
-        // Then, configure the OpenLayers widget with $jsOptionIdentifier = "identifier".
+        // Usage: sibilino.openlayers.mapOptions[mapId] = { layers: [new ol.layer.Vector(...)] }
+        // Then, configure the OpenLayers widget with "id" equal to mapId
         mapOptions: {},
-        createMap: function (options, id, jsOptionIdentifier) {
+        // Create the map with the options coming from PHP as the "options" argument.
+        // Options will be merged with mapOptions[id], if existing.
+        createMap: function (options, id) {
             if (typeof id === "undefined") {
                 id = options['target'];
             }
-            if (typeof jsOptionIdentifier !== "undefined") {
-                $.extend(true, options, mapOptions[jsOptionIdentifier]); // Deep merge
+            if (mapOptions[id]) {
+                $.extend(true, options, mapOptions[id]); // Deep merge of mapOptions into options
             }
             maps[id] = new ol.Map(options);
         },
@@ -25,7 +27,7 @@ sibilino.openlayers = (function ($) {
             return maps[id];
         }
     };
-    // ... private functions and properties go here ...
+    
     return pub;
 })(jQuery);
 
