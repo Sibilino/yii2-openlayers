@@ -147,7 +147,7 @@ In addition, whenever a layer has been defined using a type string, the source c
 
 ## Map options as javascript
 ----------------------------
-The widget publishes a javascript module that is exposed in the global scope as `sibilino.openlayers`. Options for the creation of the map with id <mapId> can be specified as an object in the `sibilino.openlayers.mapOptions`array. For example:
+The widget publishes a javascript module that is exposed in the global scope as `sibilino.openlayers`. Options for the creation of the map with id `mapId` can be specified as an object in the `sibilino.openlayers.mapOptions`array. For example:
 ```js
 sibilino.openlayers.mapOptions[mapId] = {
     layers: [
