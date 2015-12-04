@@ -20,7 +20,7 @@ sibilino.olwidget = (function ($) {
             if (pub.mapOptions[id]) {
                 $.extend(true, options, pub.mapOptions[id]); // Deep merge of mapOptions into options
             }
-            this.maps[id] = new ol.Map(options);
+            pub.maps[id] = new ol.Map(options);
         },
         maps: {},
         getMapById: function (id) {

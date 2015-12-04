@@ -3,9 +3,7 @@ namespace sibilino\yii2\openlayers;
 
 use yii\base\Widget;
 use yii\helpers\Html;
-use yii\web\View;
 use yii\helpers\Json;
-use yii\web\JsExpression;
 
 /**
  * Yii 2 widget encapsulating OpenLayers 3 and offering simplified option specification.
@@ -27,6 +25,8 @@ class OpenLayers extends Widget
 	 */
 	public $mapOptions = [];
 
+    public $mapOptionScript;
+
 	public function init()
 	{
 		if (!isset($this->options['id']))
@@ -39,6 +39,11 @@ class OpenLayers extends Widget
 	public function run()
 	{
 		$this->processMapOptions();
+
+        if ($this->mapOptionScript)
+        {
+            $this->view->registerJsFile($this->mapOptionScript, ['depends'=>OLModuleBundle::className()]);
+        }
         
         $script = 'sibilino.olwidget.createMap('.Json::encode($this->mapOptions).', "'.$this->options['id'].'")';
 		$this->view->registerJs($script);
@@ -84,12 +89,15 @@ class OpenLayers extends Widget
 			if (is_string($type))
 			{
 				if (is_string($options))
-					$options = ['source' => new OL("source.$options")];
-					
+                {
+                    $options = ['source' => new OL("source.$options")];
+                }
 				$processedLayers []= new OL("layer.$type", $options);
 			}
 			else // Therefore $type is simply an integer array key
-				$processedLayers []= $options;
+            {
+                $processedLayers []= $options;
+            }
 		}
 		$this->mapOptions['layers'] = $processedLayers;
 	}

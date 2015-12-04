@@ -8,7 +8,7 @@ class OLModuleBundle extends AssetBundle
     public $sourcePath = __DIR__;
 
     public $js = [
-        'js/module.js',
+        'js/olwidget.js',
     ];
     public $depends = [
         'yii\web\JqueryAsset',
