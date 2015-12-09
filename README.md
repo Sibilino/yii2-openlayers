@@ -50,23 +50,26 @@ The widget will automatically publish the OpenLayers library and output the div 
 
 # Configuration
 ----------------
-The widget supports the following configuration options (to be used outside of the mapOptions array):
+The widget supports the following configuration options (actual OpenLayers.js options go in the `mapOptions` array):
 * `id`: The id for the widget and the generated container div.
 * `options`: Array of HTML options for the container div.
 * `jsVarName`: The name of the JavaScript variable that will receive the Map object upon construction.
 * `scriptPosition`: The position where the widget will register the map generation code (`View::POS_END` by default). Note that the OpenLayers _library_ will always be registered in `View::POS_HEAD`.
-* `mapOptions`: The configuration array to be passed to the JavaScript OpenLayers Map() constructor. Its structure and available options are the same that are supported by the [OpenLayers 3 library] (http://openlayers.org/). Some simplifications are supported by the widget, as described in the next section.
+* `mapOptions`: The configuration array to be passed to the JavaScript OpenLayers Map() constructor. Its structure and available options are the same that are supported by the [OpenLayers 3 library] (http://openlayers.org/). Some simplifications are supported, as described below.
+* `mapOptionScript`: Url of a JavaScript file to be registered after the *olwidget.js* module. Can be array, to register multiple scripts. Scripts can register options for a map with id `mapId` by setting them in `sibilino.olwidget.mapOptions[mapId]`. See below for details.
 
 # Specifying map options
 ------------------------
 The problem with OpenLayers map options is that they require complex javascript structures. Two approches are available:
 
-1. Manage your configuration in PHP and translate it to javascript.
-2. Manage your configuration directly in javascript.
+1. Managing your configuration in PHP and translate it to javascript.
+2. Managing your configuration directly in javascript.
 
 If your map configuration is relatively simple and depends mostly on data structures that already exist in your PHP application, approach #1 will probably be easier. This widget contains the OL class that can facilitate PHP to javascript translation. See below for details.
 
-When your configuration begins getting complex, the OL class begins to show limitations and you must use JsExpressions, which are no longer easy to nest and basically mean you are again writing plain javascript. In this case, approach #2 is probably necessary. This widget provides a javascript module that easily passes your configuration from your file to the created map. See below for details.
+When your configuration begins getting complex, the OL class begins to show limitations and you must use JsExpressions, which are no longer easy to nest and basically mean you are again writing plain javascript. In this case, approach #2 is probably necessary. This widget provides a javascript module that easily passes your configuration from a script file to the created map. See below for details.
+
+Mixing up both approaches can be the best way to easily define your map configuration.
 
 ## Map options as PHP array
 -----------------------
@@ -150,10 +153,25 @@ In addition, whenever a layer has been defined using a type string, the source c
 ----------------------------
 The widget publishes a javascript module that is exposed in the global scope as `sibilino.olwidget`. Options for the creation of the map with id `mapId` can be specified as an object in the `sibilino.olwidget.mapOptions` array, associated with the `mapId` key. For example:
 ```js
-sibilino.olwidget.mapOptions[mapId] = {
+sibilino.olwidget.mapOptions['mainMap'] = {
     layers: [
     	new ol.layer.Vector({...})
     ]
 }
 ```
-Make sure that your javascript code that tries to access the module is inserted *after* the module script.
+You can register this kind of script by setting its web-accessible URL in the `mapOptionScript` property of the PHP widget. For example:
+```php
+echo OpenLayers::widget([
+    'id' => 'mainMap',
+    'mapOptionScript' => '@web/js/yourscript.js',
+    'mapOptions' => [
+    	// These options will be merged with the ones in yourscript.js
+    	// ...
+    ],
+    //...
+]);
+```
+Alternatively, you can access the `sibilino.olwidget` module from any javascript code that is loaded *after* the module script. To ensure proper script order, you can use a dependency to `sibilino\yii2\openlayers\OLModuleBundle`. For example:
+```php
+$view->registerJsFile($script, ['depends' => OLModuleBundle::className()]);
+```
