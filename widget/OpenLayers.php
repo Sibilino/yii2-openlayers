@@ -19,18 +19,23 @@ class OpenLayers extends Widget
      */
 	public $options = [];
 	/**
-	 * The properties to be passed to the OpenLayers Map() constructor. In order to ease passing complex javascript structures, some simplifications are supported.
+	 * The properties to be passed to the OpenLayers Map() constructor. In order to ease passing complex JavaScript structures, some simplifications are supported.
 	 * See {@link OpenLayers::processMapOptions} for details on simplified option specification.
 	 * @var array
 	 */
 	public $mapOptions = [];
-
-    public $mapOptionScript;
+    /**
+     * The scripts that operate with the olwidget.js module, e. g. to apply map configuration in plain JavaScript.
+     * Can be array to register multiple scripts. If the array is given string keys, they will be passed to [[yii\web\View::registerJsFile()]].
+     * @var string|array
+     */
+    public $mapOptionScript = [];
 
 	public function init()
 	{
-		if (!isset($this->options['id']))
+		if (!isset($this->options['id'])) {
 			$this->options['id'] = $this->getId();
+		}
 		$this->mapOptions['target'] = $this->options['id'];
 		OpenLayersBundle::register($this->view);
         OLModuleBundle::register($this->view);
@@ -40,9 +45,12 @@ class OpenLayers extends Widget
 	{
 		$this->processMapOptions();
 
-        if ($this->mapOptionScript)
-        {
-            $this->view->registerJsFile($this->mapOptionScript, ['depends'=>OLModuleBundle::className()]);
+        $scripts = is_array($this->mapOptionScript) ? $this->mapOptionScript : [$this->mapOptionScript];
+        foreach ($scripts as $key => $script) {
+            if (!is_string($key)) {
+                $key = null; // Dont specify a key for non-associative array of scripts
+            }
+            $this->view->registerJsFile($script, ['depends'=>OLModuleBundle::className()], $key);
         }
         
         $script = 'sibilino.olwidget.createMap('.Json::encode($this->mapOptions).', "'.$this->options['id'].'")';
@@ -70,11 +78,13 @@ class OpenLayers extends Widget
 	 */
 	protected function processMapOptions()
 	{
-		if (isset($this->mapOptions['view']) && is_array($this->mapOptions['view']))
+		if (isset($this->mapOptions['view']) && is_array($this->mapOptions['view'])) {
 			$this->mapOptions['view'] = new OL('View', $this->mapOptions['view']);
+		}
 		
-		if (isset($this->mapOptions['layers']))
+		if (isset($this->mapOptions['layers'])) {
 			$this->processSimplifiedLayers();
+		}
 	}
 	
 	/**
@@ -84,18 +94,13 @@ class OpenLayers extends Widget
 	protected function processSimplifiedLayers()
 	{
 		$processedLayers = [];
-		foreach ($this->mapOptions['layers'] as $type => $options)
-		{
-			if (is_string($type))
-			{
-				if (is_string($options))
-                {
+		foreach ($this->mapOptions['layers'] as $type => $options) {
+			if (is_string($type)) {
+				if (is_string($options)) {
                     $options = ['source' => new OL("source.$options")];
                 }
 				$processedLayers []= new OL("layer.$type", $options);
-			}
-			else // Therefore $type is simply an integer array key
-            {
+			} else { // Therefore $type is simply an integer array key
                 $processedLayers []= $options;
             }
 		}
