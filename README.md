@@ -8,7 +8,7 @@ OpenLayers 3 Widget for Yii 2
 This widget encapsulates the [OpenLayers 3] (http://openlayers.org/) library for easy use in Yii 2. It automatically registers the OpenLayers library and creates a map on the target div.
 
 The widget also facilitates defining the complex configuration options for a map, featuring:
-* Shortcut mechanisms to translate your PHP structures into JavasCript.
+* Shortcut mechanisms to translate your PHP structures into JavaScript.
 * Handling of extra JavaScript code to be applied to the map.
 
 # Installation
@@ -59,7 +59,7 @@ The widget will automatically publish the OpenLayers library and output the div 
 The widget supports the following configuration options (actual OpenLayers.js options go in the `mapOptions` array):
 * `id`: The id for the widget and the generated container div.
 * `options`: Array of HTML options for the container div.
-* `mapOptions`: The configuration array to be passed to the JavaScript OpenLayers Map() constructor. Its structure and available options are the same that are supported by the [OpenLayers 3 library] (http://openlayers.org/). Some simplifications are supported, as described below.
+* `mapOptions`: The configuration array to be passed to the JavaScript OpenLayers Map() constructor. The `target` option is handled automatically if not specified. Its structure and available options are the same that are supported by the [OpenLayers 3 library] (http://openlayers.org/). Some simplifications are supported, as described below.
 * `mapOptionScript`: Url of a JavaScript file to be registered after the *olwidget.js* module. Can be array, to register multiple scripts. Scripts can register options for a map with id `mapId` by setting them in `sibilino.olwidget.mapOptions[mapId]`. See below for details.
 
 # Specifying map options
