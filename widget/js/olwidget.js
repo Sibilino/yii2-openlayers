@@ -8,7 +8,7 @@ sibilino.olwidget = (function ($) {
             // Nothing to init
         },
         // Storage for additional options that may be set by other javascript scripts
-        // Usage: sibilino.openlayers.mapOptions[mapId] = { layers: [new ol.layer.Vector(...)] }
+        // Usage: sibilino.olwidget.mapOptions[mapId] = { layers: [new ol.layer.Vector(...)] }
         // Then, configure the OpenLayers widget with "id" equal to mapId
         mapOptions: {},
         // Create the map with the options coming from PHP as the "options" argument.
