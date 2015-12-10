@@ -169,8 +169,9 @@ echo OpenLayers::widget([
     'id' => 'mainMap',
     'mapOptionScript' => '@web/js/yourscript.js',
     'mapOptions' => [
-    	// These options will be merged with the ones in yourscript.js
-    	// ...
+        // Put your PHP-generated options here.
+        // These options will be merged with the ones in yourscript.js.
+        // ...
     ],
     //...
 ]);
