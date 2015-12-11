@@ -1,8 +1,8 @@
 <?php
 namespace sibilino\yii2\openlayers;
 
+use Yii;
 use yiiunit\TestCase;
-use yii\web\View;
 use yii\web\JsExpression;
 
 class OpenLayersTest extends TestCase
@@ -11,11 +11,11 @@ class OpenLayersTest extends TestCase
 	{
 		parent::setUp();
 		$this->mockApplication([
-			'vendorPath' => __DIR__.'/../../../..',
+			'vendorPath' => __DIR__.'/../../..',
 			'components' => [
 				'assetManager' => [
-					'basePath' => __DIR__.'/../../../../../assets',
-					'baseUrl' => 'http://localhost/tester2/assets',
+					'basePath' => __DIR__.'/../../../../assets',
+					'baseUrl' => 'http://localhost/basic/assets',
 				],
 			],
 			'aliases' => [
@@ -29,8 +29,9 @@ class OpenLayersTest extends TestCase
 	{
 		$widget = OpenLayers::begin();
 		$this->assertTrue(isset($widget->options['id']));
-		$this->assertTrue(isset($widget->jsVarName));
-		$this->assertArrayHasKey('sibilino\yii2\openlayers\OpenLayersBundle', $widget->view->assetBundles);
+		$this->assertTrue(isset($widget->mapOptions['target']));
+		$this->assertArrayHasKey(OpenLayersBundle::className(), $widget->view->assetBundles);
+		$this->assertArrayHasKey(OLModuleBundle::className(), $widget->view->assetBundles);
 	}
 	
 	public function testRun()
@@ -38,13 +39,18 @@ class OpenLayersTest extends TestCase
 		$this->expectOutputString('<div id="test" class="map"></div>');
 		$widget = OpenLayers::begin([
 			'id' => 'test',
-			'scriptPosition' => View::POS_LOAD,
+            'mapOptionScript' => [
+                '@vendor/js/test1.js',
+                '@vendor/js/test2.js',
+            ],
 			'options' => [
 				'class' => 'map',
 			],
 		]);
 		OpenLayers::end();
-		$this->assertArrayHasKey(View::POS_LOAD, $widget->view->js);
+        $this->assertArrayHasKey(Yii::getAlias('@vendor/js/test1.js'), $widget->view->assetBundles);
+        $this->assertArrayHasKey(Yii::getAlias('@vendor/js/test2.js'), $widget->view->assetBundles);
+		$this->assertContains('olwidget.createMap(', $this->getLastScript($widget));
 	}
 	
 	/**
@@ -60,12 +66,6 @@ class OpenLayersTest extends TestCase
 	public function optionProvider()
 	{
 		return [
-			[ // modified jsVarName
-				[
-					'jsVarName' => 'testmap',
-				],
-				'^var testmap = new ol.Map\('
-			],
 			[ // Simplified View
 				[
 					'mapOptions' => [
@@ -135,11 +135,11 @@ class OpenLayersTest extends TestCase
 	}
 		
 	/**
-	 * @param DygraphsWidget $widget
+	 * @param OpenLayers $widget
 	 * @return string
 	 */
 	private function getLastScript($widget) {
-		$scripts = $widget->view->js[$widget->scriptPosition];
+		$scripts = end($widget->view->js);
 		return end($scripts);
 	}
 }
