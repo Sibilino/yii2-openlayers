@@ -3,6 +3,15 @@ OpenLayers 3 Widget for Yii 2
 [![Build Status](https://scrutinizer-ci.com/g/Sibilino/yii2-openlayers/badges/build.png?b=master)](https://scrutinizer-ci.com/g/Sibilino/yii2-openlayers/build-status/master)
 [![Scrutinizer Code Quality](https://scrutinizer-ci.com/g/Sibilino/yii2-openlayers/badges/quality-score.png?b=master)](https://scrutinizer-ci.com/g/Sibilino/yii2-openlayers/?branch=master)
 
+# Changelog for v2
+------------------
+Version 2 of this widget is not fully compatible with version 1.
+- Removed `jsVarName` property.
+- Removed `scriptPosition` property.
+- Added JS module.
+- Added `mapOptionScript` property.
+- Minor bug fixes.
+
 # Overview
 ----------
 This widget encapsulates the [OpenLayers 3] (http://openlayers.org/) library for easy use in Yii 2. It automatically registers the OpenLayers library and creates a map on the target div.
