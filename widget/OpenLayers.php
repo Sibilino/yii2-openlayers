@@ -3,9 +3,7 @@ namespace sibilino\yii2\openlayers;
 
 use yii\base\Widget;
 use yii\helpers\Html;
-use yii\web\View;
 use yii\helpers\Json;
-use yii\web\JsExpression;
 
 /**
  * Yii 2 widget encapsulating OpenLayers 3 and offering simplified option specification.
@@ -21,37 +19,42 @@ class OpenLayers extends Widget
      */
 	public $options = [];
 	/**
-	 * The properties to be passed to the OpenLayers Map() constructor. In order to ease passing complex javascript structures, some simplifications are supported.
-	 * See {@link OpenLayers::processOptions} for details on simplified option specification.
+	 * The properties to be passed to the OpenLayers Map() constructor. In order to ease passing complex JavaScript structures, some simplifications are supported.
+	 * See {@link OpenLayers::processMapOptions} for details on simplified option specification.
 	 * @var array
 	 */
 	public $mapOptions = [];
-	/**
-	 * @var string the naem for the JavasCript variable that will receive the Map object upon execution of the widget.
-	 */
-	public $jsVarName;
-	/**
-	 * @var int the position where the Map creation script must be inserted. Default is \yii\web\View::POS_END.
-	 * @see \yii\web\View::registerJs()
-	 */
-	public $scriptPosition = View::POS_END;
-	
+    /**
+     * The scripts that operate with the olwidget.js module, e. g. to apply map configuration in plain JavaScript.
+     * Can be array to register multiple scripts. If the array is given string keys, they will be passed to [[yii\web\View::registerJsFile()]].
+     * @var string|array
+     */
+    public $mapOptionScript = [];
+
 	public function init()
 	{
-		if (!isset($this->options['id']))
+		if (!isset($this->options['id'])) {
 			$this->options['id'] = $this->getId();
-		if (!isset($this->jsVarName))
-			$this->jsVarName = $this->options['id'];
+		}
 		$this->mapOptions['target'] = $this->options['id'];
 		OpenLayersBundle::register($this->view);
+        OLModuleBundle::register($this->view);
 	}
 	
 	public function run()
 	{
-		$this->processOptions();
-		
-		$script = "var $this->jsVarName = ".Json::encode(new OL('Map', $this->mapOptions)).";";
-		$this->view->registerJs($script, $this->scriptPosition);
+		$this->processMapOptions();
+
+        $scripts = is_array($this->mapOptionScript) ? $this->mapOptionScript : [$this->mapOptionScript];
+        foreach ($scripts as $key => $script) {
+            if (!is_string($key)) {
+                $key = null; // Dont specify a key for non-associative array of scripts
+            }
+            $this->view->registerJsFile($script, ['depends'=>OLModuleBundle::className()], $key);
+        }
+        
+        $script = 'sibilino.olwidget.createMap('.Json::encode($this->mapOptions).', "'.$this->options['id'].'")';
+		$this->view->registerJs($script);
 		
 		return Html::tag('div', '', $this->options);
 	}
@@ -73,13 +76,15 @@ class OpenLayers extends Widget
 	 * If these simplifications are not enough to avoid using complex JsExpression structures, make sure to see the {@link OL} class for an abbreviated way of specifying OpenLayers object instances.
 	 * @see OL
 	 */
-	protected function processOptions()
+	protected function processMapOptions()
 	{
-		if (isset($this->mapOptions['view']) && is_array($this->mapOptions['view']))
+		if (isset($this->mapOptions['view']) && is_array($this->mapOptions['view'])) {
 			$this->mapOptions['view'] = new OL('View', $this->mapOptions['view']);
+		}
 		
-		if (isset($this->mapOptions['layers']))
+		if (isset($this->mapOptions['layers'])) {
 			$this->processSimplifiedLayers();
+		}
 	}
 	
 	/**
@@ -89,17 +94,15 @@ class OpenLayers extends Widget
 	protected function processSimplifiedLayers()
 	{
 		$processedLayers = [];
-		foreach ($this->mapOptions['layers'] as $type => $options)
-		{
-			if (is_string($type))
-			{
-				if (is_string($options))
-					$options = ['source' => new OL("source.$options")];
-					
+		foreach ($this->mapOptions['layers'] as $type => $options) {
+			if (is_string($type)) {
+				if (is_string($options)) {
+                    $options = ['source' => new OL("source.$options")];
+                }
 				$processedLayers []= new OL("layer.$type", $options);
-			}
-			else // Therefore $type is simply an integer array key
-				$processedLayers []= $options;
+			} else { // Therefore $type is simply an integer array key
+                $processedLayers []= $options;
+            }
 		}
 		$this->mapOptions['layers'] = $processedLayers;
 	}
