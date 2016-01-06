@@ -24,7 +24,7 @@ sibilino.olwidget = (function ($) {
         },
         maps: {},
         getMapById: function (id) {
-            return maps[id];
+            return pub.maps[id];
         }
     };
     
