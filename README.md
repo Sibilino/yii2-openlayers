@@ -166,10 +166,12 @@ In addition, whenever a layer has been defined using a type string, the source c
 ----------------------------
 The widget publishes a JavaScript module that is exposed in the global scope as `sibilino.olwidget`. Options for the creation of the map with id `mapId` can be specified as an object in the `sibilino.olwidget.mapOptions` array, associated with the `mapId` key. For example:
 ```js
+var select = new ol.interaction.Select({...});
 sibilino.olwidget.mapOptions['mainMap'] = {
     layers: [
     	new ol.layer.Vector({...})
-    ]
+    ],
+    interactions: ol.interaction.defaults().extend([select])
 }
 ```
 You can register this kind of script by setting its web-accessible URL in the `mapOptionScript` property of the PHP widget. For example:
@@ -180,6 +182,22 @@ echo OpenLayers::widget([
     'mapOptions' => [
         // Put your PHP-generated options here.
         // These options will be merged with the ones in yourscript.js.
+        // For example:
+        'layers' => [
+                'Tile' => [
+                    'source' => new OL('source.MapQuest', [
+                        'layer' => $selectedLayer,
+                    ]),
+                ],
+                'Vector' => [
+                    'source' => new OL('source.Cluster', [
+                        'distance' => 30,
+                        'source' => new OL('source.Vector', [
+                            'features' => $features,
+                        ]),
+                    ]),
+                ],
+        ],
         // ...
     ],
     //...
@@ -188,4 +206,10 @@ echo OpenLayers::widget([
 Alternatively, you can access the `sibilino.olwidget` module from any JavaScript code that is loaded *after* the module script. To ensure proper script order, you can use a dependency to `sibilino\yii2\openlayers\OLModuleBundle`. For example:
 ```php
 $view->registerJsFile($script, ['depends' => OLModuleBundle::className()]);
+```
+### Accessing the map object
+If you have JavaScript code that needs to work with the map object created by the widget in your PHP code, you can find it using `sibilino.olwidget.getMapById(mapId)`. This function returns the map object created by the widget with the id `mapId`. For example:
+```js
+// Assuming the PHP widget was given the id "mainMap"
+var map = sibilino.olwidget.getMapById("mainMap");
 ```
