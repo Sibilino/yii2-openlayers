@@ -12,5 +12,6 @@ class OLModuleBundle extends AssetBundle
     ];
     public $depends = [
         'yii\web\JqueryAsset',
+        'yii\web\YiiAsset',
     ];
 }
