@@ -2,6 +2,7 @@ OpenLayers 3 Widget for Yii 2
 ===============================
 [![Build Status](https://scrutinizer-ci.com/g/Sibilino/yii2-openlayers/badges/build.png?b=master)](https://scrutinizer-ci.com/g/Sibilino/yii2-openlayers/build-status/master)
 [![Scrutinizer Code Quality](https://scrutinizer-ci.com/g/Sibilino/yii2-openlayers/badges/quality-score.png?b=master)](https://scrutinizer-ci.com/g/Sibilino/yii2-openlayers/?branch=master)
+[![Total Downloads](https://poser.pugx.org/sibilino/yii2-openlayers/downloads)](https://packagist.org/packages/sibilino/yii2-openlayers)
 
 # Changelog for v2
 ------------------
